@@ -4,8 +4,14 @@ A golang tool to interact with pubsub emulator on your local env
 
 ### Install 
 
+To install the tool on your machine
 ```
 make install
+```
+
+or to have the binary recompiled in `dist` to use it as an executable
+```
+make dist
 ```
 
 ### Usage
