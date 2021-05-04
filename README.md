@@ -21,6 +21,7 @@ Flags definitions :
 ```
 --host="" // to define your local host for the pubsub emulator
 --topic="" // a topic ID
+--message="" // a json message
 ```
 
 List pub sub topics 
