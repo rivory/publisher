@@ -46,6 +46,8 @@ func init() {
 
 	publishCmd.Flags().String("message", "", "Message content to publish")
 
+	publishCmd.Flags().StringToString("attribute", nil, "Attribute to publish with the message")
+
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
@@ -80,6 +82,8 @@ func publish(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	attribute, _ := cmd.Flags().GetStringToString("attribute")
+
 	topic := client.Topic(name)
 	if topic == nil {
 		fmt.Fprintln(os.Stderr, "Cannot find topic")
@@ -87,7 +91,14 @@ func publish(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	res := topic.Publish(ctx, &pubsub.Message{Data: []byte(message)})
+	event := &pubsub.Message{
+		Data: []byte(message),
+	}
+	if attribute != nil {
+		event.Attributes = attribute
+	}
+
+	res := topic.Publish(ctx, event)
 	fmt.Fprintf(os.Stdout, "Message published: %v\n", res)
 
 	topic.Stop()

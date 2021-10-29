@@ -113,7 +113,6 @@ func listener(cmd *cobra.Command) {
 
 	err = subscriber(topic, project)
 	if err != nil {
-		spew.Dump(err)
 		return
 	}
 
