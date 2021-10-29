@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"publisher/publisher"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/spf13/cobra"
@@ -61,12 +60,11 @@ func init() {
 func publish(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 
-	host, _ := cmd.Flags().GetString("host")
-	if host == "" {
-		fmt.Fprintln(os.Stderr, "Missing host for pubsub")
-
-		return
+	client, err := InitPubsubClient(ctx, cmd)
+	if err != nil {
+		panic(err)
 	}
+	defer client.Close()
 
 	name, _ := cmd.Flags().GetString("topic")
 	if name == "" {
@@ -80,11 +78,6 @@ func publish(cmd *cobra.Command, args []string) {
 		fmt.Fprintln(os.Stderr, "Missing message content")
 
 		return
-	}
-
-	client, err := publisher.ProvidePubSubClient(ctx, host)
-	if err != nil {
-		panic(err)
 	}
 
 	topic := client.Topic(name)

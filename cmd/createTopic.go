@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"publisher/publisher"
 
 	"github.com/spf13/cobra"
 )
@@ -58,11 +57,9 @@ func init() {
 func createTopic(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 
-	host, _ := cmd.Flags().GetString("host")
-	if host == "" {
-		fmt.Fprintln(os.Stderr, "Missing host for pubsub")
-
-		return
+	client, err := InitPubsubClient(ctx, cmd)
+	if err != nil {
+		panic(err)
 	}
 
 	name, _ := cmd.Flags().GetString("topic")
@@ -70,11 +67,6 @@ func createTopic(cmd *cobra.Command, args []string) {
 		fmt.Fprintln(os.Stderr, "Missing topic name for pubsub")
 
 		return
-	}
-
-	client, err := publisher.ProvidePubSubClient(ctx, host)
-	if err != nil {
-		panic(err)
 	}
 
 	t, err := client.CreateTopic(ctx, name)

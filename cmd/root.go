@@ -16,9 +16,13 @@ limitations under the License.
 package cmd
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"os"
+	"publisher/publisher"
 
+	"cloud.google.com/go/pubsub"
 	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -57,7 +61,8 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.publisher.yaml)")
 
-	rootCmd.PersistentFlags().String("host", "", "host for the pubsub emulator")
+	rootCmd.PersistentFlags().String("host", "localhost:8085", "host for the pubsub emulator")
+	rootCmd.PersistentFlags().String("project", "local-emulator-project", "project for the pubsub emulator")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -86,4 +91,27 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
+}
+
+func InitPubsubClient(ctx context.Context, cmd *cobra.Command) (*pubsub.Client, error) {
+	host, _ := cmd.Flags().GetString("host")
+	if host == "" {
+		fmt.Fprintln(os.Stderr, "Missing host for pubsub")
+
+		return nil, errors.New("Missing host for pubsub")
+	}
+
+	project, _ := cmd.Flags().GetString("project")
+	if project == "" {
+		fmt.Fprintln(os.Stderr, "Missing project for pubsub")
+
+		return nil, errors.New("Missing project for pubsub")
+	}
+
+	client, err := publisher.ProvidePubSubClient(ctx, host, project)
+	if err != nil {
+		panic(err)
+	}
+
+	return client, nil
 }

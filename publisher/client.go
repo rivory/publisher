@@ -9,10 +9,10 @@ import (
 	"google.golang.org/api/option"
 )
 
-func ProvidePubSubClient(ctx context.Context, host string) (*pubsub.Client, error) {
+func ProvidePubSubClient(ctx context.Context, host string, projectID string) (*pubsub.Client, error) {
 	os.Setenv("PUBSUB_EMULATOR_HOST", host)
 
-	client, err := pubsub.NewClient(ctx, "local-emulator-project", option.WithCredentialsFile("{}"))
+	client, err := pubsub.NewClient(ctx, projectID, option.WithCredentialsFile("{}"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Cannot start pubsub client :", err)
 

@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"publisher/publisher"
 
 	"github.com/spf13/cobra"
 	"google.golang.org/api/iterator"
@@ -57,14 +56,7 @@ func init() {
 func listTopic(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 
-	host, _ := cmd.Flags().GetString("host")
-	if host == "" {
-		fmt.Fprintln(os.Stderr, "Missing host for pubsub")
-
-		return
-	}
-
-	client, err := publisher.ProvidePubSubClient(ctx, host)
+	client, err := InitPubsubClient(ctx, cmd)
 	if err != nil {
 		panic(err)
 	}
